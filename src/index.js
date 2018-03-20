@@ -81,7 +81,11 @@ export default class Swipeable extends PureComponent {
     leftButtonContainerStyle: ViewPropTypes.style,
     rightContainerStyle: ViewPropTypes.style,
     rightButtonContainerStyle: ViewPropTypes.style,
-    contentContainerStyle: ViewPropTypes.style
+    contentContainerStyle: ViewPropTypes.style,
+
+    // open
+    leftButtonsOpen: PropTypes.bool,
+    rightButtonsOpen: PropTypes.bool,
   };
 
   static defaultProps = {
@@ -151,20 +155,46 @@ export default class Swipeable extends PureComponent {
     // misc
     onRef: noop,
     onPanAnimatedValueRef: noop,
-    swipeStartMinDistance: 15
+    swipeStartMinDistance: 15,
+
+    // open
+    leftButtonsOpen: false,
+    rightButtonsOpen: false,
   };
 
-  state = {
-    pan: new Animated.ValueXY(),
-    width: 0,
-    lastOffset: {x: 0, y: 0},
-    leftActionActivated: false,
-    leftButtonsActivated: false,
-    leftButtonsOpen: false,
-    rightActionActivated: false,
-    rightButtonsActivated: false,
-    rightButtonsOpen: false
-  };
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      pan: new Animated.ValueXY(),
+      width: 0,
+      lastOffset: {x: 0, y: 0},
+      leftActionActivated: false,
+      leftButtonsActivated: false,
+      leftButtonsOpen: props.leftButtonsOpen,
+      rightActionActivated: false,
+      rightButtonsActivated: false,
+      rightButtonsOpen: props.rightButtonsOpen
+    };
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const newState = {};
+
+    if (nextProps.leftButtonsOpen !== this.state.leftButtonsOpen) {
+      newState.leftButtonsActivated = nextProps.leftButtonsOpen;
+      newState.leftButtonsOpen = nextProps.leftButtonsOpen;
+    }
+
+    if (nextProps.rightButtonsOpen !== this.state.rightButtonsOpen) {
+      newState.leftButtonsActivated = nextProps.rightButtonsOpen;
+      newState.leftButtonsOpen = nextProps.rightButtonsOpen;
+    }
+
+    if (Object.keys(newState).length !== 0) {
+      this.state(newState);
+    }
+  }
 
   componentWillMount() {
     const {onPanAnimatedValueRef, onRef} = this.props;
